@@ -82,6 +82,10 @@ build-%:
 build-oci-tar-builder:
 	$(CARGO) build $(TARGET_FLAG) -p oci-tar-builder $(FEATURES_$*) $(RELEASE_FLAG)
 
+.PHONY: publish-check
+publish-check:
+	cargo publish -p containerd-shim-wasm --dry-run --verbose --locked
+
 .PHONY: check check-common check-wasm check-%
 check: check-wasm $(RUNTIMES:%=check-%);
 
@@ -134,6 +138,11 @@ test-%:
 
 test-doc:
 	RUST_LOG=trace $(CARGO) test --doc -- --test-threads=1
+
+test/stress-%: dist-%
+	# Do not use trace logging as that negatively impacts performance.
+	# Do not use cross (always use cargo) to avoid the qemu environment.
+	cargo run -p stress-test $(TARGET_FLAG) -- $(PWD)/dist/bin/containerd-shim-$*-v1 --count=100 --parallel=$$(nproc || echo 10) --timeout=2s
 
 generate-doc:
 	RUST_LOG=trace $(CARGO) doc --workspace --all-features --no-deps --document-private-items --exclude wasi-demo-app
@@ -211,19 +220,32 @@ dist/img-oci-artifact.tar: target/wasm32-wasip1/$(OPT_PROFILE)/img-oci-artifact.
 	@mkdir -p "dist/"
 	cp "$<" "$@"
 
-load: dist/img.tar
-	sudo ctr -n $(CONTAINERD_NAMESPACE) image import --all-platforms $<
+.PHONY: pull pull-app pull-oci pull-oci-artifact pull-http
+pull: pull-app pull-oci pull-oci-artifact pull-http
+	echo "Pulled all images"
 
-CTR_VERSION := $(shell sudo ctr version | sed -n -e '/Version/ {s/.*: *//p;q;}')
-load/oci: dist/img-oci.tar dist/img-oci-artifact.tar
-	@echo $(CTR_VERSION)\\nv1.7.7 | sort -crV || @echo $(CTR_VERSION)\\nv1.6.25 | sort -crV || (echo "containerd version must be 1.7.7+ or 1.6.25+ was $(CTR_VERSION)" && exit 1)
-	@echo using containerd $(CTR_VERSION)
-	sudo ctr -n $(CONTAINERD_NAMESPACE) image import --all-platforms $<
-	sudo ctr -n $(CONTAINERD_NAMESPACE) image import --all-platforms dist/img-oci-artifact.tar
+pull-app:
+	sudo ctr image pull ghcr.io/containerd/runwasi/wasi-demo-app:latest
 
-.PHONY: load/http
-load/http: dist/http-img-oci.tar
-	sudo ctr -n $(CONTAINERD_NAMESPACE) image import --all-platforms $<
+pull-oci:
+	sudo ctr image pull ghcr.io/containerd/runwasi/wasi-demo-oci:latest
+
+pull-oci-artifact:
+	sudo ctr image pull ghcr.io/containerd/runwasi/wasi-demo-oci-artifact:latest
+
+pull-http:
+	sudo ctr image pull ghcr.io/containerd/runwasi/wasi-http:latest
+
+docker/load: dist/img.tar
+	docker load -i $<
+
+docker/load/oci: dist/img-oci.tar dist/img-oci-artifact.tar
+	docker load -i dist/img-oci.tar
+	docker load -i dist/img-oci-artifact.tar
+
+.PHONY: docker/load/http
+docker/load/http: dist/http-img-oci.tar
+	docker load -i $<
 
 target/wasm32-wasip1/$(OPT_PROFILE)/img-oci.tar: target/wasm32-wasip1/$(OPT_PROFILE)/wasi-demo-app.wasm
 	mkdir -p ${CURDIR}/bin/$(OPT_PROFILE)/
@@ -262,9 +284,8 @@ test/nginx:
 	mkdir -p $@/out && docker save -o $@/out/img.tar docker.io/nginx:latest
 
 .PHONY: test/k8s/cluster-%
-test/k8s/cluster-%: dist/img.tar bin/kind test/k8s/_out/img-%
-	bin/kind create cluster --name $(KIND_CLUSTER_NAME) --image="$(shell cat test/k8s/_out/img-$*)" && \
-	bin/kind load image-archive --name $(KIND_CLUSTER_NAME) $(<)
+test/k8s/cluster-%: bin/kind test/k8s/_out/img-%
+	bin/kind create cluster --name $(KIND_CLUSTER_NAME) --image="$(shell cat test/k8s/_out/img-$*)"
 
 
 .PHONY: test/k8s/deploy-workload-%
@@ -276,9 +297,7 @@ test/k8s/deploy-workload-%: test/k8s/clean test/k8s/cluster-%
 	kubectl --context=kind-$(KIND_CLUSTER_NAME) wait deployment wasi-demo --for condition=Available=True --timeout=5s
 
 .PHONY: test/k8s/deploy-workload-oci-%
-test/k8s/deploy-workload-oci-%: test/k8s/clean test/k8s/cluster-% dist/img-oci.tar dist/img-oci-artifact.tar test/k8s/cluster-%
-	bin/kind load image-archive --name $(KIND_CLUSTER_NAME) dist/img-oci.tar
-	bin/kind load image-archive --name $(KIND_CLUSTER_NAME) dist/img-oci-artifact.tar
+test/k8s/deploy-workload-oci-%: test/k8s/clean test/k8s/cluster-%
 	kubectl --context=kind-$(KIND_CLUSTER_NAME) apply -f test/k8s/deploy.oci.yaml
 	kubectl --context=kind-$(KIND_CLUSTER_NAME) wait deployment wasi-demo --for condition=Available=True --timeout=300s
 	# verify that we are still running after some time
@@ -319,7 +338,7 @@ bin/k3s/clean:
 
 .PHONY: test/k3s-%
 test/k3s-%: dist/img.tar bin/k3s dist-%
-	sudo bash -c -- 'while ! timeout 40 test/k3s/bootstrap.sh "$*" dist/img.tar; do $(MAKE) bin/k3s/clean bin/k3s; done'
+	sudo bash -c -- 'while ! timeout 40 test/k3s/bootstrap.sh "$*"; do $(MAKE) bin/k3s/clean bin/k3s; done'
 	sudo bin/k3s kubectl get pods --all-namespaces
 	sudo bin/k3s kubectl apply -f test/k8s/deploy.yaml
 	sudo bin/k3s kubectl get pods --all-namespaces
@@ -332,8 +351,8 @@ test/k3s-%: dist/img.tar bin/k3s dist-%
 	sudo bin/k3s kubectl wait deployment wasi-demo --for delete --timeout=60s
 
 .PHONY: test/k3s-oci-%
-test/k3s-oci-%: dist/img-oci.tar bin/k3s dist-%
-	sudo bash -c -- 'while ! timeout 40 test/k3s/bootstrap.sh "$*" dist/img-oci.tar; do $(MAKE) bin/k3s/clean bin/k3s; done'
+test/k3s-oci-%: bin/k3s dist-%
+	sudo bash -c -- 'while ! timeout 40 test/k3s/bootstrap.sh "$*"; do $(MAKE) bin/k3s/clean bin/k3s; done'
 	sudo bin/k3s kubectl get pods --all-namespaces
 	sudo bin/k3s kubectl apply -f test/k8s/deploy.oci.yaml
 	sudo bin/k3s kubectl get pods --all-namespaces

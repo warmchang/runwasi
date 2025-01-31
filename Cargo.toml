@@ -25,8 +25,8 @@ homepage = "https://github.com/containerd/runwasi"
 anyhow = "1.0"
 cap-std = "1.0"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
-containerd-shim = "0.7.4"
-containerd-shim-wasm = { path = "crates/containerd-shim-wasm", version = "0.8.0" }
+containerd-shim = "0.8"
+containerd-shim-wasm = { path = "crates/containerd-shim-wasm", version = "0.9.0" }
 containerd-shim-wasm-test-modules = { path = "crates/containerd-shim-wasm-test-modules", version = "0.4.0"}
 oci-tar-builder = { path = "crates/oci-tar-builder", version = "0.4.0" }
 env_logger = "0.11"
@@ -40,14 +40,14 @@ serde = "1.0"
 serde_json = "1.0"
 sha256 = "1.5.0"
 tar = "0.4"
-tempfile = "3.14"
+tempfile = "3.15"
 thiserror = "2.0"
-wat = "1.222"
+wat = "1.223"
 windows-sys = "0.59"
 serial_test = "3"
 tracing = "0.1"
 hyper = "1.5.2"
-tokio = { version = "1.42.0", default-features = false }
+tokio = { version = "1.43.0", default-features = false }
 tokio-util = { version = "0.7", default-features = false }
 
 # wasmtime

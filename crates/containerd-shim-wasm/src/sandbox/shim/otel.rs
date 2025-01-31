@@ -26,7 +26,9 @@ use std::collections::HashMap;
 use std::env;
 
 use opentelemetry::global::{self, set_text_map_propagator};
-use opentelemetry::trace::{TraceError, TracerProvider as _};
+use opentelemetry::propagation::Extractor;
+use opentelemetry::trace::TraceError;
+use opentelemetry::Context;
 use opentelemetry_otlp::{
     Protocol, SpanExporterBuilder, WithExportConfig, OTEL_EXPORTER_OTLP_PROTOCOL_DEFAULT,
 };
@@ -34,11 +36,12 @@ pub use opentelemetry_otlp::{
     OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_PROTOCOL, OTEL_EXPORTER_OTLP_TRACES_ENDPOINT,
 };
 use opentelemetry_sdk::propagation::TraceContextPropagator;
-use opentelemetry_sdk::runtime;
-use tracing::Span;
-use tracing_opentelemetry::OpenTelemetrySpanExt as _;
+use opentelemetry_sdk::{runtime, trace as sdktrace};
+use tracing::span::{Attributes, Id};
+use tracing::{Span, Subscriber};
+use tracing_opentelemetry::{OpenTelemetrySpanExt as _, OtelData};
 use tracing_subscriber::layer::SubscriberExt as _;
-use tracing_subscriber::{EnvFilter, Registry};
+use tracing_subscriber::{EnvFilter, Layer, Registry};
 
 const OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_JSON: &str = "http/json";
 const OTEL_EXPORTER_OTLP_PROTOCOL_HTTP_PROTOBUF: &str = "http/protobuf";
@@ -91,7 +94,10 @@ impl Config {
 
         let filter = EnvFilter::try_new("info,h2=off")?;
 
-        let subscriber = Registry::default().with(telemetry).with(filter);
+        let subscriber = Registry::default()
+            .with(telemetry)
+            .with(filter)
+            .with(SpanNamingLayer);
 
         tracing::subscriber::set_global_default(subscriber)?;
         Ok(ShutdownGuard)
@@ -137,16 +143,11 @@ impl Config {
             Protocol::Grpc => self.init_tracer_grpc(),
         };
 
-        let tracer = opentelemetry_otlp::new_pipeline()
+        opentelemetry_otlp::new_pipeline()
             .tracing()
             .with_exporter(exporter)
-            .with_trace_config(Default::default())
-            .install_batch(runtime::Tokio)?
-            .tracer_builder("containerd-shim-wasm")
-            .with_version(env!("CARGO_PKG_VERSION"))
-            .build();
-
-        Ok(tracer)
+            .with_trace_config(sdktrace::config())
+            .install_batch(runtime::Tokio)
     }
 }
 
@@ -182,6 +183,51 @@ fn traces_protocol_from_env() -> anyhow::Result<Protocol> {
         ))?,
     };
     Ok(protocol)
+}
+
+/// A layer that renames spans to include the target in the span name.
+struct SpanNamingLayer;
+
+impl<S> Layer<S> for SpanNamingLayer
+where
+    S: Subscriber + for<'a> tracing_subscriber::registry::LookupSpan<'a>,
+{
+    fn on_new_span(
+        &self,
+        attrs: &Attributes<'_>,
+        id: &Id,
+        ctx: tracing_subscriber::layer::Context<'_, S>,
+    ) {
+        let span = ctx.span(id).expect("Span not found");
+        let mut extensions = span.extensions_mut();
+
+        if let Some(otel_data) = extensions.get_mut::<OtelData>() {
+            let target = attrs.metadata().target();
+            let original_name = attrs.metadata().name();
+            let new_name = format!("{}::{}", target, original_name);
+            otel_data.builder.name = new_name.into();
+        }
+    }
+}
+
+/// MetadataExtractor is a wrapper around HashMap<String, Vec<String>> which is the type
+/// as TtrpcContext.meatdata. It implements the Extractor trait from opentelemetry.
+struct MetadataExtractor<'a>(pub &'a HashMap<String, Vec<String>>);
+
+impl Extractor for MetadataExtractor<'_> {
+    fn get(&self, key: &str) -> Option<&str> {
+        self.0.get(key).and_then(|v| v.first()).map(|s| s.as_str())
+    }
+
+    fn keys(&self) -> Vec<&str> {
+        self.0.keys().map(|k| k.as_str()).collect()
+    }
+}
+
+/// extract_context extracts the context from the metadata HashMap.
+pub(crate) fn extract_context(metadata: &HashMap<String, Vec<String>>) -> Context {
+    let extractor = MetadataExtractor(metadata);
+    opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
 }
 
 #[cfg(test)]
@@ -374,5 +420,20 @@ mod tests {
             let result = Config::build_from_env();
             assert!(result.is_err());
         });
+    }
+
+    #[test]
+    fn test_metadata_extractor() {
+        let mut metadata = HashMap::new();
+        metadata.insert("key".to_string(), vec!["value".to_string()]);
+        metadata.insert("key2".to_string(), vec!["value2".to_string()]);
+
+        let extractor = MetadataExtractor(&metadata);
+        assert_eq!(extractor.get("key"), Some("value"));
+        let mut keys = extractor.keys();
+        keys.sort();
+        assert_eq!(keys, vec!["key", "key2"]);
+
+        assert_eq!(extractor.get("key2"), Some("value2"));
     }
 }
