@@ -83,8 +83,6 @@ struct MyInstance {
 }
 
 impl Instance for MyInstance {
-    type Engine = MyEngine;
-
     fn new(id: String, cfg: &InstanceConfig) -> Result<Self, Error> {
         Ok(MyInstance { engine: MyEngine })
     }
@@ -101,8 +99,8 @@ impl Instance for MyInstance {
         Ok(())
     }
 
-    fn wait_timeout(&self, t: impl Into<Option<Duration>>) -> Option<(u32, DateTime<Utc>)> {
-        Some((0, Utc::now()))
+    async fn wait(&self) -> (u32, DateTime<Utc>) {
+        (0, Utc::now())
     }
 }
 ```

@@ -19,15 +19,13 @@ use oci_spec::runtime::{
     get_default_namespaces,
 };
 
+use crate::sandbox::async_utils::AmbientRuntime as _;
 use crate::sandbox::{Instance, InstanceConfig};
 
 pub const TEST_NAMESPACE: &str = "runwasi-test";
 pub const SIGKILL: u32 = 9;
 
-pub struct WasiTestBuilder<WasiInstance: Instance>
-where
-    WasiInstance::Engine: Default + Send + Sync + Clone,
-{
+pub struct WasiTestBuilder<WasiInstance: Instance> {
     container_name: String,
     start_fn: String,
     namespaces: Vec<LinuxNamespace>,
@@ -35,18 +33,12 @@ where
     _phantom: PhantomData<WasiInstance>,
 }
 
-pub struct WasiTest<WasiInstance: Instance>
-where
-    WasiInstance::Engine: Default + Send + Sync + Clone,
-{
+pub struct WasiTest<WasiInstance: Instance> {
     instance: WasiInstance,
     tempdir: tempfile::TempDir,
 }
 
-impl<WasiInstance: Instance> WasiTestBuilder<WasiInstance>
-where
-    WasiInstance::Engine: Default + Send + Sync + Clone,
-{
+impl<WasiInstance: Instance> WasiTestBuilder<WasiInstance> {
     pub fn new() -> Result<Self> {
         zygote::Zygote::init();
 
@@ -214,21 +206,22 @@ where
 
         log::info!("building wasi test: {}", dir.display());
 
-        let mut cfg = InstanceConfig::new(TEST_NAMESPACE, "/run/containerd/containerd.sock");
-        cfg.set_bundle(dir)
-            .set_stdout(dir.join("stdout"))
-            .set_stderr(dir.join("stderr"))
-            .set_stdin(dir.join("stdin"));
+        let cfg = InstanceConfig {
+            namespace: TEST_NAMESPACE.to_string(),
+            containerd_address: "/run/containerd/containerd.sock".to_string(),
+            bundle: dir.to_path_buf(),
+            stdout: dir.join("stdout"),
+            stderr: dir.join("stderr"),
+            stdin: dir.join("stdin"),
+            ..Default::default()
+        };
 
         let instance = WasiInstance::new(self.container_name, &cfg)?;
         Ok(WasiTest { instance, tempdir })
     }
 }
 
-impl<WasiInstance: Instance> WasiTest<WasiInstance>
-where
-    WasiInstance::Engine: Default + Send + Sync + Clone,
-{
+impl<WasiInstance: Instance> WasiTest<WasiInstance> {
     pub fn builder() -> Result<WasiTestBuilder<WasiInstance>> {
         WasiTestBuilder::new()
     }
@@ -269,9 +262,9 @@ where
         Ok(self)
     }
 
-    pub fn wait(&self, timeout: Duration) -> Result<(u32, String, String)> {
+    pub fn wait(&self, t: Duration) -> Result<(u32, String, String)> {
         log::info!("waiting wasi test");
-        let (status, _) = match self.instance.wait_timeout(timeout) {
+        let (status, _) = match self.instance.wait().with_timeout(t).block_on() {
             Some(res) => res,
             None => {
                 self.instance.kill(SIGKILL)?;

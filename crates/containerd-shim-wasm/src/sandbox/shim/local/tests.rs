@@ -7,7 +7,7 @@ use anyhow::Context;
 use chrono::{DateTime, Utc};
 use containerd_shim::api::Status;
 use containerd_shim::event::Event;
-use protobuf::MessageDyn;
+use protobuf::{MessageDyn, SpecialFields};
 use serde_json as json;
 use tempfile::tempdir;
 
@@ -23,7 +23,6 @@ pub struct InstanceStub {
 }
 
 impl Instance for InstanceStub {
-    type Engine = ();
     fn new(_id: String, _cfg: &InstanceConfig) -> Result<Self, Error> {
         Ok(InstanceStub {
             exit_code: WaitableCell::new(),
@@ -39,8 +38,8 @@ impl Instance for InstanceStub {
     fn delete(&self) -> Result<(), Error> {
         Ok(())
     }
-    fn wait_timeout(&self, t: impl Into<Option<Duration>>) -> Option<(u32, DateTime<Utc>)> {
-        self.exit_code.wait_timeout(t).copied()
+    async fn wait(&self) -> (u32, DateTime<Utc>) {
+        *self.exit_code.wait().await
     }
 }
 
@@ -106,7 +105,6 @@ fn test_delete_after_create() {
 
     let (tx, _rx) = channel();
     let local = Arc::new(Local::<InstanceStub, _>::new(
-        (),
         tx,
         Arc::new(ExitSignal::default()),
         "test_namespace",
@@ -137,7 +135,6 @@ fn test_cri_task() -> Result<()> {
     let (etx, _erx) = channel();
     let exit_signal = Arc::new(ExitSignal::default());
     let local = Arc::new(Local::<InstanceStub, _>::new(
-        (),
         etx,
         exit_signal,
         "test_namespace",
@@ -307,7 +304,6 @@ fn test_task_lifecycle() -> Result<()> {
     let (etx, _erx) = channel(); // TODO: check events
     let exit_signal = Arc::new(ExitSignal::default());
     let local = Arc::new(Local::<InstanceStub, _>::new(
-        (),
         etx,
         exit_signal,
         "test_namespace",
@@ -415,6 +411,41 @@ fn test_task_lifecycle() -> Result<()> {
         Error::NotFound(_) => {}
         e => return Err(e),
     }
+
+    Ok(())
+}
+
+#[test]
+fn test_default_runtime_options() -> Result<()> {
+    let options: Option<&Any> = None;
+
+    let config = Config::get_from_options(options).unwrap();
+
+    assert_eq!(config.systemd_cgroup, false);
+
+    Ok(())
+}
+
+#[test]
+fn test_custom_runtime_options() -> Result<()> {
+    let options = Options {
+        type_url: "runtimeoptions.v1.Options".to_string(),
+        config_path: "".to_string(),
+        config_body: "SystemdCgroup = true\n".to_string(),
+    };
+    let req = CreateTaskRequest {
+        options: Some(Any {
+            type_url: options.type_url.clone(),
+            value: options.encode_to_vec(),
+            special_fields: SpecialFields::default(),
+        })
+        .into(),
+        ..Default::default()
+    };
+
+    let config = Config::get_from_options(req.options.as_ref()).unwrap();
+
+    assert_eq!(config.systemd_cgroup, true);
 
     Ok(())
 }

@@ -4,9 +4,10 @@ use std::ops::Not;
 use std::path::Path;
 use std::sync::{Arc, RwLock};
 use std::thread;
+#[cfg(feature = "opentelemetry")]
 use std::time::Duration;
 
-use anyhow::{Context as AnyhowContext, ensure};
+use anyhow::ensure;
 use containerd_shim::api::{
     ConnectRequest, ConnectResponse, CreateTaskRequest, CreateTaskResponse, DeleteRequest, Empty,
     KillRequest, ShutdownRequest, StartRequest, StartResponse, StateRequest, StateResponse,
@@ -18,6 +19,7 @@ use containerd_shim::protos::shim::shim_ttrpc::Task;
 use containerd_shim::protos::types::task::Status;
 use containerd_shim::util::IntoOption;
 use containerd_shim::{DeleteResponse, ExitSignal, TtrpcContext, TtrpcResult};
+use futures::FutureExt as _;
 use log::debug;
 use oci_spec::runtime::Spec;
 use prost::Message;
@@ -28,6 +30,7 @@ use tracing_opentelemetry::OpenTelemetrySpanExt as _;
 
 #[cfg(feature = "opentelemetry")]
 use super::otel::extract_context;
+use crate::sandbox::async_utils::AmbientRuntime as _;
 use crate::sandbox::instance::{Instance, InstanceConfig};
 use crate::sandbox::shim::events::{EventSender, RemoteEventSender, ToTimestamp};
 use crate::sandbox::shim::instance_data::InstanceData;
@@ -84,7 +87,6 @@ type LocalInstances<T> = RwLock<HashMap<String, Arc<InstanceData<T>>>>;
 /// Local implements the Task service for a containerd shim.
 /// It defers all task operations to the `Instance` implementation.
 pub struct Local<T: Instance + Send + Sync, E: EventSender = RemoteEventSender> {
-    pub engine: T::Engine,
     pub(super) instances: LocalInstances<T>,
     events: E,
     exit: Arc<ExitSignal>,
@@ -96,10 +98,9 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     /// Creates a new local task service.
     #[cfg_attr(
         feature = "tracing",
-        tracing::instrument(skip(engine, events, exit), level = "Debug")
+        tracing::instrument(skip(events, exit), level = "Debug")
     )]
     pub fn new(
-        engine: T::Engine,
         events: E,
         exit: Arc<ExitSignal>,
         namespace: impl AsRef<str> + std::fmt::Debug,
@@ -109,7 +110,6 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
         let namespace = namespace.as_ref().to_string();
         let containerd_address = containerd_address.as_ref().to_string();
         Self {
-            engine,
             instances,
             events,
             exit,
@@ -132,11 +132,6 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
     fn is_empty(&self) -> bool {
         self.instances.read().unwrap().is_empty()
-    }
-
-    #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn instance_config(&self) -> InstanceConfig {
-        InstanceConfig::new(&self.namespace, &self.containerd_address)
     }
 }
 
@@ -191,12 +186,15 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
             }
         }
 
-        let mut cfg = self.instance_config();
-        cfg.set_bundle(&req.bundle)
-            .set_stdin(&req.stdin)
-            .set_stdout(&req.stdout)
-            .set_stderr(&req.stderr)
-            .set_config(config);
+        let cfg = InstanceConfig {
+            namespace: self.namespace.clone(),
+            containerd_address: self.containerd_address.clone(),
+            bundle: req.bundle.as_str().into(),
+            stdout: req.stdout.as_str().into(),
+            stderr: req.stderr.as_str().into(),
+            stdin: req.stdin.as_str().into(),
+            config,
+        };
 
         // Check if this is a cri container
         let instance = InstanceData::new(req.id(), cfg)?;
@@ -251,21 +249,18 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
 
         let id = req.id().to_string();
 
-        thread::Builder::new()
-            .name(format!("{id}-wait"))
-            .spawn(move || {
-                let (exit_code, timestamp) = i.wait();
-                events.send(TaskExit {
-                    container_id: id.clone(),
-                    exit_status: exit_code,
-                    exited_at: Some(timestamp.to_timestamp()).into(),
-                    pid,
-                    id,
-                    ..Default::default()
-                });
-            })
-            .context("could not spawn thread to wait exit")
-            .map_err(Error::from)?;
+        async move {
+            let (exit_code, timestamp) = i.wait().await;
+            events.send(TaskExit {
+                container_id: id.clone(),
+                exit_status: exit_code,
+                exited_at: Some(timestamp.to_timestamp()).into(),
+                pid,
+                id,
+                ..Default::default()
+            });
+        }
+        .spawn();
 
         debug!("started: {:?}", req);
 
@@ -295,7 +290,7 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
         i.delete()?;
 
         let pid = i.pid().unwrap_or_default();
-        let (exit_code, timestamp) = i.wait_timeout(Duration::ZERO).unzip();
+        let (exit_code, timestamp) = i.wait().now_or_never().unzip();
         let timestamp = timestamp.map(ToTimestamp::to_timestamp);
 
         self.instances.write().unwrap().remove(req.id());
@@ -323,7 +318,7 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
         }
 
         let i = self.get_instance(req.id())?;
-        let (exit_code, timestamp) = i.wait();
+        let (exit_code, timestamp) = i.wait().block_on();
 
         debug!("wait finishes");
         Ok(WaitResponse {
@@ -341,7 +336,7 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
 
         let i = self.get_instance(req.id())?;
         let pid = i.pid();
-        let (exit_code, timestamp) = i.wait_timeout(Duration::ZERO).unzip();
+        let (exit_code, timestamp) = i.wait().now_or_never().unzip();
         let timestamp = timestamp.map(ToTimestamp::to_timestamp);
 
         let status = if pid.is_none() {
@@ -353,10 +348,10 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
         };
 
         Ok(StateResponse {
-            bundle: i.config().get_bundle().to_string_lossy().to_string(),
-            stdin: i.config().get_stdin().to_string_lossy().to_string(),
-            stdout: i.config().get_stdout().to_string_lossy().to_string(),
-            stderr: i.config().get_stderr().to_string_lossy().to_string(),
+            bundle: i.config.bundle.to_string_lossy().to_string(),
+            stdin: i.config.stdin.to_string_lossy().to_string(),
+            stdout: i.config.stdout.to_string_lossy().to_string(),
+            stderr: i.config.stderr.to_string_lossy().to_string(),
             pid: pid.unwrap_or_default(),
             exit_status: exit_code.unwrap_or_default(),
             exited_at: timestamp.into(),

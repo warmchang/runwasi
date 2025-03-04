@@ -9,8 +9,6 @@ use crate::sandbox::{Error as SandboxError, Instance as SandboxInstance, Instanc
 pub struct Instance<E: Engine>(PhantomData<E>);
 
 impl<E: Engine> SandboxInstance for Instance<E> {
-    type Engine = E;
-
     fn new(_id: String, _cfg: &InstanceConfig) -> Result<Self, SandboxError> {
         todo!();
     }
@@ -35,8 +33,8 @@ impl<E: Engine> SandboxInstance for Instance<E> {
 
     /// Waits for the instance to finish and returns its exit code
     /// Returns None if the timeout is reached before the instance has finished.
-    /// This is a blocking call.
-    fn wait_timeout(&self, _t: impl Into<Option<Duration>>) -> Option<(u32, DateTime<Utc>)> {
+    /// This is an async call.
+    async fn wait(&self) -> (u32, DateTime<Utc>) {
         todo!();
     }
 }
