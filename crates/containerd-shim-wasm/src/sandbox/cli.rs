@@ -91,6 +91,7 @@ pub mod r#impl {
     pub use git_version::git_version;
 }
 
+use super::async_utils::AmbientRuntime as _;
 pub use crate::{revision, version};
 
 /// Get the crate version from Cargo.toml.
@@ -151,6 +152,22 @@ fn log_mem() {
     log::info!("Zygote peak memory usage was: peak resident set {rss} kB, peak total {tot} kB");
 }
 
+#[cfg(unix)]
+fn init_zygote_and_logger(debug: bool, config: &Config) {
+    zygote::Zygote::init();
+    if config.no_setup_logger {
+        return;
+    }
+    zygote::Zygote::global().run(
+        |(debug, default_log_level)| {
+            // last two arguments are unused in unix
+            crate::vendor::containerd_shim::logger::init(debug, &default_log_level, "", "")
+                .expect("Failed to initialize logger");
+        },
+        (debug, config.default_log_level.clone()),
+    );
+}
+
 /// Main entry point for the shim.
 ///
 /// If the `opentelemetry` feature is enabled, this function will start the shim with OpenTelemetry tracing.
@@ -164,23 +181,45 @@ pub fn shim_main<'a, I>(
     config: Option<Config>,
 ) where
     I: 'static + Instance + Sync + Send,
-    I::Engine: Default,
 {
+    // parse the version flag
+    let os_args: Vec<_> = std::env::args_os().collect();
+
+    let flags = parse(&os_args[1..]).unwrap();
+    let argv0 = PathBuf::from(&os_args[0]);
+    let argv0 = argv0.file_stem().unwrap_or_default().to_string_lossy();
+
+    if flags.version {
+        println!("{argv0}:");
+        println!("  Runtime: {name}");
+        println!("  Version: {version}");
+        println!("  Revision: {}", revision.into().unwrap_or("<none>"));
+        println!();
+
+        std::process::exit(0);
+    }
+
+    // Initialize the zygote and logger for the container process
     #[cfg(unix)]
-    zygote::Zygote::init();
+    {
+        let default_config = Config::default();
+        let config = config.as_ref().unwrap_or(&default_config);
+        init_zygote_and_logger(flags.debug, config);
+    }
 
     #[cfg(feature = "opentelemetry")]
     if otel_traces_enabled() {
         // opentelemetry uses tokio, so we need to initialize a runtime
-        use tokio::runtime::Runtime;
-        let rt = Runtime::new().unwrap();
-        rt.block_on(async {
+        async {
             let otlp_config = OtlpConfig::build_from_env().expect("Failed to build OtelConfig.");
             let _guard = otlp_config
                 .init()
                 .expect("Failed to initialize OpenTelemetry.");
-            shim_main_inner::<I>(name, version, revision, shim_version, config);
-        });
+            tokio::task::block_in_place(move || {
+                shim_main_inner::<I>(name, version, revision, shim_version, config);
+            });
+        }
+        .block_on();
     } else {
         shim_main_inner::<I>(name, version, revision, shim_version, config);
     }
@@ -203,7 +242,6 @@ fn shim_main_inner<'a, I>(
     config: Option<Config>,
 ) where
     I: 'static + Instance + Sync + Send,
-    I::Engine: Default,
 {
     #[cfg(feature = "opentelemetry")]
     {
@@ -220,24 +258,8 @@ fn shim_main_inner<'a, I>(
             }
         }
     }
-    let os_args: Vec<_> = std::env::args_os().collect();
-
-    let flags = parse(&os_args[1..]).unwrap();
-    let argv0 = PathBuf::from(&os_args[0]);
-    let argv0 = argv0.file_stem().unwrap_or_default().to_string_lossy();
-
-    if flags.version {
-        println!("{argv0}:");
-        println!("  Runtime: {name}");
-        println!("  Version: {version}");
-        println!("  Revision: {}", revision.into().unwrap_or("<none>"));
-        println!();
-
-        std::process::exit(0);
-    }
 
     let shim_version = shim_version.into().unwrap_or("v1");
-
     let lower_name = name.to_lowercase();
     let shim_id = format!("io.containerd.{lower_name}.{shim_version}");
 

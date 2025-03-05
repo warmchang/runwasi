@@ -2,11 +2,9 @@ use std::collections::HashMap;
 use std::fs::create_dir_all;
 use std::ops::Not;
 use std::path::Path;
-use std::sync::{Arc, RwLock};
-use std::thread;
-use std::time::Duration;
+use std::sync::Arc;
 
-use anyhow::{Context as AnyhowContext, ensure};
+use anyhow::ensure;
 use containerd_shim::api::{
     ConnectRequest, ConnectResponse, CreateTaskRequest, CreateTaskResponse, DeleteRequest, Empty,
     KillRequest, ShutdownRequest, StartRequest, StartResponse, StateRequest, StateResponse,
@@ -17,20 +15,24 @@ use containerd_shim::protos::events::task::{TaskCreate, TaskDelete, TaskExit, Ta
 use containerd_shim::protos::shim::shim_ttrpc::Task;
 use containerd_shim::protos::types::task::Status;
 use containerd_shim::util::IntoOption;
-use containerd_shim::{DeleteResponse, ExitSignal, TtrpcContext, TtrpcResult};
+use containerd_shim::{DeleteResponse, TtrpcContext, TtrpcResult};
+use futures::FutureExt as _;
 use log::debug;
 use oci_spec::runtime::Spec;
 use prost::Message;
 use protobuf::well_known_types::any::Any;
 use serde::{Deserialize, Serialize};
+use tokio::sync::RwLock;
 #[cfg(feature = "opentelemetry")]
 use tracing_opentelemetry::OpenTelemetrySpanExt as _;
 
 #[cfg(feature = "opentelemetry")]
 use super::otel::extract_context;
+use crate::sandbox::async_utils::AmbientRuntime as _;
 use crate::sandbox::instance::{Instance, InstanceConfig};
 use crate::sandbox::shim::events::{EventSender, RemoteEventSender, ToTimestamp};
 use crate::sandbox::shim::instance_data::InstanceData;
+use crate::sandbox::sync::WaitableCell;
 use crate::sandbox::{Error, Result, oci};
 use crate::sys::metrics::get_metrics;
 
@@ -84,10 +86,9 @@ type LocalInstances<T> = RwLock<HashMap<String, Arc<InstanceData<T>>>>;
 /// Local implements the Task service for a containerd shim.
 /// It defers all task operations to the `Instance` implementation.
 pub struct Local<T: Instance + Send + Sync, E: EventSender = RemoteEventSender> {
-    pub engine: T::Engine,
     pub(super) instances: LocalInstances<T>,
     events: E,
-    exit: Arc<ExitSignal>,
+    exit: WaitableCell<()>,
     namespace: String,
     containerd_address: String,
 }
@@ -96,12 +97,11 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     /// Creates a new local task service.
     #[cfg_attr(
         feature = "tracing",
-        tracing::instrument(skip(engine, events, exit), level = "Debug")
+        tracing::instrument(skip(events, exit), level = "Debug")
     )]
     pub fn new(
-        engine: T::Engine,
         events: E,
-        exit: Arc<ExitSignal>,
+        exit: WaitableCell<()>,
         namespace: impl AsRef<str> + std::fmt::Debug,
         containerd_address: impl AsRef<str> + std::fmt::Debug,
     ) -> Self {
@@ -109,7 +109,6 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
         let namespace = namespace.as_ref().to_string();
         let containerd_address = containerd_address.as_ref().to_string();
         Self {
-            engine,
             instances,
             events,
             exit,
@@ -119,31 +118,26 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    pub(super) fn get_instance(&self, id: &str) -> Result<Arc<InstanceData<T>>> {
-        let instance = self.instances.read().unwrap().get(id).cloned();
+    pub(super) async fn get_instance(&self, id: &str) -> Result<Arc<InstanceData<T>>> {
+        let instance = self.instances.read().await.get(id).cloned();
         instance.ok_or_else(|| Error::NotFound(id.to_string()))
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn has_instance(&self, id: &str) -> bool {
-        self.instances.read().unwrap().contains_key(id)
+    async fn has_instance(&self, id: &str) -> bool {
+        self.instances.read().await.contains_key(id)
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn is_empty(&self) -> bool {
-        self.instances.read().unwrap().is_empty()
-    }
-
-    #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn instance_config(&self) -> InstanceConfig {
-        InstanceConfig::new(&self.namespace, &self.containerd_address)
+    async fn is_empty(&self) -> bool {
+        self.instances.read().await.is_empty()
     }
 }
 
 // These are the same functions as in Task, but without the TtrcpContext, which is useful for testing
 impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn task_create(&self, req: CreateTaskRequest) -> Result<CreateTaskResponse> {
+    async fn task_create(&self, req: CreateTaskRequest) -> Result<CreateTaskResponse> {
         let config = Config::get_from_options(req.options.as_ref())
             .map_err(|err| Error::InvalidArgument(format!("invalid shim options: {err}")))?;
 
@@ -157,7 +151,7 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
             ));
         }
 
-        if self.has_instance(&req.id) {
+        if self.has_instance(&req.id).await {
             return Err(Error::AlreadyExists(req.id));
         }
 
@@ -191,19 +185,22 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
             }
         }
 
-        let mut cfg = self.instance_config();
-        cfg.set_bundle(&req.bundle)
-            .set_stdin(&req.stdin)
-            .set_stdout(&req.stdout)
-            .set_stderr(&req.stderr)
-            .set_config(config);
+        let cfg = InstanceConfig {
+            namespace: self.namespace.clone(),
+            containerd_address: self.containerd_address.clone(),
+            bundle: req.bundle.as_str().into(),
+            stdout: req.stdout.as_str().into(),
+            stderr: req.stderr.as_str().into(),
+            stdin: req.stdin.as_str().into(),
+            config,
+        };
 
         // Check if this is a cri container
-        let instance = InstanceData::new(req.id(), cfg)?;
+        let instance = InstanceData::new(req.id(), cfg).await?;
 
         self.instances
             .write()
-            .unwrap()
+            .await
             .insert(req.id().to_string(), Arc::new(instance));
 
         self.events.send(TaskCreate {
@@ -233,13 +230,13 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn task_start(&self, req: StartRequest) -> Result<StartResponse> {
+    async fn task_start(&self, req: StartRequest) -> Result<StartResponse> {
         if req.exec_id().is_empty().not() {
             return Err(ShimError::Unimplemented("exec is not supported".to_string()).into());
         }
 
-        let i = self.get_instance(req.id())?;
-        let pid = i.start()?;
+        let i = self.get_instance(req.id()).await?;
+        let pid = i.start().await?;
 
         self.events.send(TaskStart {
             container_id: req.id().into(),
@@ -251,21 +248,18 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
 
         let id = req.id().to_string();
 
-        thread::Builder::new()
-            .name(format!("{id}-wait"))
-            .spawn(move || {
-                let (exit_code, timestamp) = i.wait();
-                events.send(TaskExit {
-                    container_id: id.clone(),
-                    exit_status: exit_code,
-                    exited_at: Some(timestamp.to_timestamp()).into(),
-                    pid,
-                    id,
-                    ..Default::default()
-                });
-            })
-            .context("could not spawn thread to wait exit")
-            .map_err(Error::from)?;
+        async move {
+            let (exit_code, timestamp) = i.wait().await;
+            events.send(TaskExit {
+                container_id: id.clone(),
+                exit_status: exit_code,
+                exited_at: Some(timestamp.to_timestamp()).into(),
+                pid,
+                id,
+                ..Default::default()
+            });
+        }
+        .spawn();
 
         debug!("started: {:?}", req);
 
@@ -276,29 +270,32 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn task_kill(&self, req: KillRequest) -> Result<Empty> {
+    async fn task_kill(&self, req: KillRequest) -> Result<Empty> {
         if !req.exec_id().is_empty() {
             return Err(Error::InvalidArgument("exec is not supported".to_string()));
         }
-        self.get_instance(req.id())?.kill(req.signal())?;
+        self.get_instance(req.id())
+            .await?
+            .kill(req.signal())
+            .await?;
         Ok(Empty::new())
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn task_delete(&self, req: DeleteRequest) -> Result<DeleteResponse> {
+    async fn task_delete(&self, req: DeleteRequest) -> Result<DeleteResponse> {
         if !req.exec_id().is_empty() {
             return Err(Error::InvalidArgument("exec is not supported".to_string()));
         }
 
-        let i = self.get_instance(req.id())?;
+        let i = self.get_instance(req.id()).await?;
 
-        i.delete()?;
+        i.delete().await?;
 
         let pid = i.pid().unwrap_or_default();
-        let (exit_code, timestamp) = i.wait_timeout(Duration::ZERO).unzip();
+        let (exit_code, timestamp) = i.wait().now_or_never().unzip();
         let timestamp = timestamp.map(ToTimestamp::to_timestamp);
 
-        self.instances.write().unwrap().remove(req.id());
+        self.instances.write().await.remove(req.id());
 
         self.events.send(TaskDelete {
             container_id: req.id().into(),
@@ -317,13 +314,13 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn task_wait(&self, req: WaitRequest) -> Result<WaitResponse> {
+    async fn task_wait(&self, req: WaitRequest) -> Result<WaitResponse> {
         if !req.exec_id().is_empty() {
             return Err(Error::InvalidArgument("exec is not supported".to_string()));
         }
 
-        let i = self.get_instance(req.id())?;
-        let (exit_code, timestamp) = i.wait();
+        let i = self.get_instance(req.id()).await?;
+        let (exit_code, timestamp) = i.wait().await;
 
         debug!("wait finishes");
         Ok(WaitResponse {
@@ -334,14 +331,14 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn task_state(&self, req: StateRequest) -> Result<StateResponse> {
+    async fn task_state(&self, req: StateRequest) -> Result<StateResponse> {
         if !req.exec_id().is_empty() {
             return Err(Error::InvalidArgument("exec is not supported".to_string()));
         }
 
-        let i = self.get_instance(req.id())?;
+        let i = self.get_instance(req.id()).await?;
         let pid = i.pid();
-        let (exit_code, timestamp) = i.wait_timeout(Duration::ZERO).unzip();
+        let (exit_code, timestamp) = i.wait().now_or_never().unzip();
         let timestamp = timestamp.map(ToTimestamp::to_timestamp);
 
         let status = if pid.is_none() {
@@ -353,10 +350,10 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
         };
 
         Ok(StateResponse {
-            bundle: i.config().get_bundle().to_string_lossy().to_string(),
-            stdin: i.config().get_stdin().to_string_lossy().to_string(),
-            stdout: i.config().get_stdout().to_string_lossy().to_string(),
-            stderr: i.config().get_stderr().to_string_lossy().to_string(),
+            bundle: i.config.bundle.to_string_lossy().to_string(),
+            stdin: i.config.stdin.to_string_lossy().to_string(),
+            stdout: i.config.stdout.to_string_lossy().to_string(),
+            stderr: i.config.stderr.to_string_lossy().to_string(),
             pid: pid.unwrap_or_default(),
             exit_status: exit_code.unwrap_or_default(),
             exited_at: timestamp.into(),
@@ -366,8 +363,8 @@ impl<T: Instance + Send + Sync, E: EventSender> Local<T, E> {
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Debug"))]
-    fn task_stats(&self, req: StatsRequest) -> Result<StatsResponse> {
-        let i = self.get_instance(req.id())?;
+    async fn task_stats(&self, req: StatsRequest) -> Result<StatsResponse> {
+        let i = self.get_instance(req.id()).await?;
         let pid = i
             .pid()
             .ok_or_else(|| Error::InvalidArgument("task is not running".to_string()))?;
@@ -393,7 +390,7 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        Ok(self.task_create(req)?)
+        Ok(self.task_create(req).block_on()?)
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Info"))]
@@ -403,7 +400,7 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        Ok(self.task_start(req)?)
+        Ok(self.task_start(req).block_on()?)
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Info"))]
@@ -413,7 +410,7 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        Ok(self.task_kill(req)?)
+        Ok(self.task_kill(req).block_on()?)
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Info"))]
@@ -423,7 +420,7 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        Ok(self.task_delete(req)?)
+        Ok(self.task_delete(req).block_on()?)
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Info"))]
@@ -431,33 +428,39 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         debug!("wait: {:?}", req);
 
         #[cfg(feature = "opentelemetry")]
-        {
+        let span_exporter = {
             use tracing::{Level, Span, span};
             let parent_span = Span::current();
             parent_span.set_parent(extract_context(&_ctx.metadata));
 
-            let (tx, rx) = std::sync::mpsc::channel();
-            // Start a thread to export interval span for long wait
-
-            let _ = thread::spawn(move || {
+            // This future never completes as it runs an infinite loop.
+            // It will stop executing when dropped.
+            // We need to keep this future's lifetime tied to this
+            // method's lifetime.
+            // This means we shouldn't tokio::spawn it, but rather
+            // tokio::select! it inside of this async method.
+            async move {
                 loop {
                     let current_span =
                         span!(parent: &parent_span, Level::INFO, "task wait 60s interval");
                     let _enter = current_span.enter();
-                    if rx.recv_timeout(Duration::from_secs(60)).is_ok() {
-                        break;
-                    }
+                    tokio::time::sleep(std::time::Duration::from_secs(60)).await;
                 }
-            });
-            let result = self.task_wait(req)?;
-            tx.send(()).unwrap();
-            Ok(result)
-        }
+            }
+        };
 
         #[cfg(not(feature = "opentelemetry"))]
-        {
-            Ok(self.task_wait(req)?)
+        let span_exporter = std::future::pending::<()>();
+
+        let res = async {
+            tokio::select! {
+                _ = span_exporter => unreachable!(),
+                res = self.task_wait(req) => res,
+            }
         }
+        .block_on()?;
+
+        Ok(res)
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Info"))]
@@ -467,7 +470,7 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        let i = self.get_instance(req.id())?;
+        let i = self.get_instance(req.id()).block_on()?;
         let shim_pid = std::process::id();
         let task_pid = i.pid().unwrap_or_default();
         Ok(ConnectResponse {
@@ -484,7 +487,7 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        Ok(self.task_state(req)?)
+        Ok(self.task_state(req).block_on()?)
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(skip(self), level = "Info"))]
@@ -494,8 +497,8 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        if self.is_empty() {
-            self.exit.signal();
+        if self.is_empty().block_on() {
+            let _ = self.exit.set(());
         }
         Ok(Empty::new())
     }
@@ -507,6 +510,6 @@ impl<T: Instance + Sync + Send, E: EventSender> Task for Local<T, E> {
         #[cfg(feature = "opentelemetry")]
         tracing::Span::current().set_parent(extract_context(&_ctx.metadata));
 
-        Ok(self.task_stats(req)?)
+        Ok(self.task_stats(req).block_on()?)
     }
 }
