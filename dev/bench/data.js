@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1742088602140,
+  "lastUpdate": 1742088628132,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -1856,6 +1856,52 @@ window.BENCHMARK_DATA = {
             "value": 80385845,
             "range": "± 1700913",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jorge Prendes",
+            "username": "jprendes",
+            "email": "jorge.prendes@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "3240088e247f61952fa6b961ff61aa9799ae92be",
+          "message": "Merge pull request #876 from z63d/feat/refactor-cgroup-driver\n\nchore: refactor for handling of cgroup driver",
+          "timestamp": "2025-02-26T15:35:37Z",
+          "url": "https://github.com/warmchang/runwasi/commit/3240088e247f61952fa6b961ff61aa9799ae92be"
+        },
+        "date": 1742088627651,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15248,
+            "unit": "kB",
+            "extra": "shim: 12544 kB\nzygote: 2704 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 65220,
+            "unit": "kB",
+            "extra": "shim: 52992 kB\nzygote: 12228 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18308,
+            "unit": "kB",
+            "extra": "shim: 15104 kB\nzygote: 3204 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 18884,
+            "unit": "kB",
+            "extra": "shim: 15872 kB\nzygote: 3012 kB"
           }
         ]
       }
