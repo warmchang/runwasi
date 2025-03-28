@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>OpenTelemetry Integration - Runwasi Developer Documentation</title>
+        <title>Project Roadmap - Runwasi Developer Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -12,32 +12,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="favicon.svg">
-        <link rel="shortcut icon" href="favicon.png">
-        <link rel="stylesheet" href="css/variables.css">
-        <link rel="stylesheet" href="css/general.css">
-        <link rel="stylesheet" href="css/chrome.css">
-        <link rel="stylesheet" href="css/print.css" media="print">
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="fonts/fonts.css">
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root to javascript -->
         <script>
-            var path_to_root = "";
+            var path_to_root = "../";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc.js"></script>
+        <script src="../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -89,7 +89,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -123,13 +123,13 @@
                     <h1 class="menu-title">Runwasi Developer Documentation</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         <a href="https://github.com/containerd/runwasi" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        <a href="https://github.com/containerd/runwasi/edit/main/docs/src/opentelemetry.md" title="Suggest an edit" aria-label="Suggest an edit">
+                        <a href="https://github.com/containerd/runwasi/edit/main/docs/src/developer/roadmap.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
@@ -158,62 +158,29 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="opentelemetry"><a class="header" href="#opentelemetry">OpenTelemetry</a></h1>
-<p><a href="https://opentelemetry.io/">OpenTelemetry</a> is a set of libraries, agents, and instrumentation to provide observability (metrics, logs and traces) in applications.</p>
-<p><code>containerd-shim-wasm</code> crate has a set of APIs to enable OpenTelemetry tracing in the shim. This document is a guide on how to use OpenTelemetry tracing in your shim.</p>
-<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
-<blockquote>
-<p>Wasmtime shim v0.5.0 has OpenTelemetry tracing enabled by default</p>
-</blockquote>
-<p>To use OpenTelemetry tracing in your shim, you need to use the <code>opentelemetry</code> feature in the <code>containerd-shim-wasm</code> crate.</p>
-<pre><code class="language-toml">containerd-shim-wasm = { workspace = true, features = ["opentelemetry"] }
-</code></pre>
-<p>Then, you may use the <code>containerd_shim_wasm::sandbox::cli::shim_main</code> function to run the shim with OpenTelemetry tracing.</p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    shim_main::&lt;WasmtimeInstance&gt;(version!(), revision!(), None);
-}</code></pre></pre>
-<p>You may also use the <code>containerd_shim_wasm::sandbox::shim::OtlpConfig</code> struct to configure the OpenTelemetry tracing manually.</p>
-<h3 id="running-containerd-with-opentelemetry"><a class="header" href="#running-containerd-with-opentelemetry">Running containerd with OpenTelemetry</a></h3>
-<p>You can configure / run containerd with OpenTelemetry tracing. Please refer to the <a href="https://github.com/containerd/containerd/blob/v2.0.0/docs/tracing.md#sending-traces-from-containerd-daemon">containerd documentation</a> for more information.</p>
-<pre><code class="language-sh">OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-
-# by default, Containerd uses the `http/protobuf` protocol
-</code></pre>
-<p><code>Runwasi</code> will automatically pick up the environment variables and start exporting traces to the specified endpoint.</p>
-<h3 id="jeager-exporter"><a class="header" href="#jeager-exporter">Jeager Exporter</a></h3>
-<p>You may use Jeager exporter to see the traces in the Jeager UI.</p>
-<pre><code class="language-sh">docker run -d -p16686:16686 -p4317:4317 -p4318:4318 -e COLLECTOR_OTLP_ENABLED=true jaegertracing/all-in-one:latest
-</code></pre>
-<p>You can access the Jeager UI at <code>http://localhost:16686</code>.</p>
-<h3 id="demo"><a class="header" href="#demo">Demo</a></h3>
-<p>Assuming you installed the <code>containerd-shim-wasmtime-v1</code> shim binary and the demo wasm image following README.md instructions,
-you can run the wasmtime shim with OpenTelemetry tracing by running the following command</p>
-<pre><code class="language-sh">sudo ctr run  --net-host --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm /wasi-demo-app.wasm sleep 3
-</code></pre>
-<p><img src="assets/wasmtime-shim-jeager.png" alt="A screenshot of the jeager UI for the wasmtime shim" /></p>
-<p><img src="assets/wasmtime-shim-tracing-main.png" alt="A screenshot of the jeager UI for traces of the main function call of the wasmtime shim" /></p>
-<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment Variables</a></h2>
-<p><code>Runwasi</code> uses the standard <a href="https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/">OTLP environment variables</a> to configure the OTLP exporter endpoint. The following environment variables are supported:</p>
-<ul>
-<li><code>OTEL_EXPORTER_OTLP_ENDPOINT</code> - A base endpoint to send trace data to.</li>
-<li><code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</code> - The endpoint to send trace data to. Overrides <code>OTEL_EXPORTER_OTLP_ENDPOINT</code>.</li>
-<li><code>OTEL_EXPORTER_OTLP_PROTOCOL</code> - A base protocol to use when sending trace data. Default is <code>http/protobuf</code>. Valid values are <code>http/protobuf</code>, <code>grpc</code>.</li>
-<li><code>OTEL_EXPORTER_OTLP_TRACES_PROTOCOL</code> - The protocol to use when sending trace data. Overrides <code>OTEL_EXPORTER_OTLP_PROTOCOL</code>.</li>
-<li><code>OTEL_SDK_DISABLED</code> - Disables the SDK if set to <code>true</code>.</li>
-<li><code>OTEL_SERVICE_NAME</code> - The name of the service.</li>
-</ul>
-<h2 id="context-propagation"><a class="header" href="#context-propagation">Context Propagation</a></h2>
-<p><code>Runwasi</code> uses the <code>TRACECONTEXT</code> environment variable to propagate the trace context between the parent shim process and the child. The trace context is a W3C Trace Context header.</p>
+                        <h1 id="project-roadmap"><a class="header" href="#project-roadmap">Project Roadmap</a></h1>
+<p>This document outlines the future development plans for Runwasi. It serves as a guide for contributors and users to understand where the project is headed.</p>
+<h2 id="current-status-and-10-release-plan"><a class="header" href="#current-status-and-10-release-plan">Current Status and 1.0 Release Plan</a></h2>
+<p>Runwasi is currently in active development and targeting a stable 1.0 release in the upcoming months. The project tracks development priorities and progress on the <a href="https://github.com/orgs/containerd/projects/8/views/1">Runwasi Project Board</a>.</p>
+<p>The 1.0 release will mark an important milestone for Runwasi, providing a stable API and features that are ready for production use.</p>
+<h2 id="contributing-to-the-roadmap"><a class="header" href="#contributing-to-the-roadmap">Contributing to the Roadmap</a></h2>
+<p>We welcome contributions to help us achieve these goals! If you’re interested in contributing:</p>
+<ol>
+<li>Check the <a href="https://github.com/orgs/containerd/projects/8/views/1">Project Board</a> for current priorities</li>
+<li>Join discussions on <a href="https://github.com/containerd/runwasi/issues">GitHub Issues</a></li>
+<li>Participate in <a href="../resources/community.html">community meetings and discussions</a></li>
+<li>Review the <a href="../CONTRIBUTING.html">Contributing Guide</a> for detailed information on how to get involved</li>
+</ol>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="benchmarks.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../RELEASE.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="resources/troubleshooting.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../benchmarks.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -223,11 +190,11 @@ you can run the wasmtime shim with OpenTelemetry tracing by running the followin
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="benchmarks.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../RELEASE.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="resources/troubleshooting.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../benchmarks.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -242,17 +209,17 @@ you can run the wasmtime shim with OpenTelemetry tracing by running the followin
         </script>
 
 
-        <script src="elasticlunr.min.js"></script>
-        <script src="mark.min.js"></script>
-        <script src="searcher.js"></script>
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
 
-        <script src="clipboard.min.js"></script>
-        <script src="highlight.js"></script>
-        <script src="book.js"></script>
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="mermaid.min.js"></script>
-        <script src="mermaid-init.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
 
 
     </div>
