@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743212777523,
+  "lastUpdate": 1743298771285,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -3480,6 +3480,52 @@ window.BENCHMARK_DATA = {
             "value": 82941909,
             "range": "± 1441323",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jiaxiao Zhou",
+            "username": "Mossaka",
+            "email": "duibao55328@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "a73e5bcea5a19f88981b97daaa1c4b7d1832b8c8",
+          "message": "Merge pull request #960 from Mossaka/rc1\n\ncontainerd-shim-wasm: bump version to 1.0.0-rc.1",
+          "timestamp": "2025-03-28T20:58:20Z",
+          "url": "https://github.com/warmchang/runwasi/commit/a73e5bcea5a19f88981b97daaa1c4b7d1832b8c8"
+        },
+        "date": 1743298770820,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15396,
+            "unit": "kB",
+            "extra": "shim: 12416 kB\nzygote: 2980 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66640,
+            "unit": "kB",
+            "extra": "shim: 54144 kB\nzygote: 12496 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18688,
+            "unit": "kB",
+            "extra": "shim: 15232 kB\nzygote: 3456 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 19128,
+            "unit": "kB",
+            "extra": "shim: 15616 kB\nzygote: 3512 kB"
           }
         ]
       }
