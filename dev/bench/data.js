@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744335792716,
+  "lastUpdate": 1744335794702,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -7281,6 +7281,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/warmchang/runwasi/commit/696687f832885ed4979482bcf77ef66f1dd8833d"
         },
         "date": 1744248493088,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "HTTP p95 Latency",
+            "value": 4.3,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "7e44250d20785d43eb7641d543b1ee9ec4018287",
+          "message": "chore(deps): bump crossbeam-channel in the cargo group (#970)\n\nBumps the cargo group with 1 update: [crossbeam-channel](https://github.com/crossbeam-rs/crossbeam).\n\n\nUpdates `crossbeam-channel` from 0.5.13 to 0.5.15\n- [Release notes](https://github.com/crossbeam-rs/crossbeam/releases)\n- [Changelog](https://github.com/crossbeam-rs/crossbeam/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/crossbeam-rs/crossbeam/compare/crossbeam-channel-0.5.13...crossbeam-channel-0.5.15)\n\n---\nupdated-dependencies:\n- dependency-name: crossbeam-channel\n  dependency-version: 0.5.15\n  dependency-type: indirect\n  dependency-group: cargo\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2025-04-10T15:05:52Z",
+          "url": "https://github.com/warmchang/runwasi/commit/7e44250d20785d43eb7641d543b1ee9ec4018287"
+        },
+        "date": 1744335794084,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
