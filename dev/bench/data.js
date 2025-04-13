@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744512917254,
+  "lastUpdate": 1744512967400,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -5150,6 +5150,76 @@ window.BENCHMARK_DATA = {
             "value": 19380,
             "unit": "kB",
             "extra": "shim: 16000 kB\nzygote: 3380 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Kaita Nakamura",
+            "username": "z63d",
+            "email": "94943154+z63d@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "d24e9e66bcec13b41fe57f97c7531bd3be1e0f7c",
+          "message": "delete setup-containerd.sh (#966)\n\nSigned-off-by: Kaita Nakamura <kaita.nakamura0830@gmail.com>",
+          "timestamp": "2025-04-11T14:16:34Z",
+          "url": "https://github.com/warmchang/runwasi/commit/d24e9e66bcec13b41fe57f97c7531bd3be1e0f7c"
+        },
+        "date": 1744512966842,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-app:latest",
+            "value": 135757064,
+            "range": "± 5353423",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-oci:latest",
+            "value": 79820991,
+            "range": "± 990145",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-app:latest",
+            "value": 111064435,
+            "range": "± 804133",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-oci:latest",
+            "value": 118474734,
+            "range": "± 1683752",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-app:latest",
+            "value": 131452466,
+            "range": "± 2481412",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-oci:latest",
+            "value": 130238250,
+            "range": "± 1251899",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-app:latest",
+            "value": 81743311,
+            "range": "± 1399583",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-oci:latest",
+            "value": 81439242,
+            "range": "± 1010041",
+            "unit": "ns/iter"
           }
         ]
       }
