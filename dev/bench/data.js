@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744594218614,
+  "lastUpdate": 1744594258779,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -5220,6 +5220,52 @@ window.BENCHMARK_DATA = {
             "value": 81439242,
             "range": "± 1010041",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Kaita Nakamura",
+            "username": "z63d",
+            "email": "94943154+z63d@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "d24e9e66bcec13b41fe57f97c7531bd3be1e0f7c",
+          "message": "delete setup-containerd.sh (#966)\n\nSigned-off-by: Kaita Nakamura <kaita.nakamura0830@gmail.com>",
+          "timestamp": "2025-04-11T14:16:34Z",
+          "url": "https://github.com/warmchang/runwasi/commit/d24e9e66bcec13b41fe57f97c7531bd3be1e0f7c"
+        },
+        "date": 1744594257409,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15272,
+            "unit": "kB",
+            "extra": "shim: 12288 kB\nzygote: 2984 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66436,
+            "unit": "kB",
+            "extra": "shim: 53632 kB\nzygote: 12804 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18944,
+            "unit": "kB",
+            "extra": "shim: 15360 kB\nzygote: 3584 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 19380,
+            "unit": "kB",
+            "extra": "shim: 15872 kB\nzygote: 3508 kB"
           }
         ]
       }
