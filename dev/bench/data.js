@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1746235751824,
+  "lastUpdate": 1746235802657,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -7470,6 +7470,76 @@ window.BENCHMARK_DATA = {
             "value": 19776,
             "unit": "kB",
             "extra": "shim: 16376 kB\nzygote: 3400 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "5652bc9ea424c5599f0109c80c4cec04b844dc0d",
+          "message": "chore(deps): bump wasmparser from 0.227.1 to 0.228.0 (#975)\n\nBumps [wasmparser](https://github.com/bytecodealliance/wasm-tools) from 0.227.1 to 0.228.0.\n- [Release notes](https://github.com/bytecodealliance/wasm-tools/releases)\n- [Commits](https://github.com/bytecodealliance/wasm-tools/commits)\n\n---\nupdated-dependencies:\n- dependency-name: wasmparser\n  dependency-version: 0.228.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2025-04-23T10:42:58Z",
+          "url": "https://github.com/warmchang/runwasi/commit/5652bc9ea424c5599f0109c80c4cec04b844dc0d"
+        },
+        "date": 1746235801779,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-app:latest",
+            "value": 142784306,
+            "range": "± 2168654",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-oci:latest",
+            "value": 82413220,
+            "range": "± 1596522",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-app:latest",
+            "value": 114255553,
+            "range": "± 7349756",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-oci:latest",
+            "value": 123871407,
+            "range": "± 2225364",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-app:latest",
+            "value": 134164066,
+            "range": "± 2827054",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-oci:latest",
+            "value": 137088339,
+            "range": "± 2274478",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-app:latest",
+            "value": 88012391,
+            "range": "± 3009427",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-oci:latest",
+            "value": 87266266,
+            "range": "± 1416275",
+            "unit": "ns/iter"
           }
         ]
       }
