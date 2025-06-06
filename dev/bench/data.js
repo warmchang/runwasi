@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1749174169079,
+  "lastUpdate": 1749174188034,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -11414,6 +11414,76 @@ window.BENCHMARK_DATA = {
             "value": 19748,
             "unit": "kB",
             "extra": "shim: 16220 kB\nzygote: 3528 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "80aa9854ad216df12bdd25987071f550d731c4b4",
+          "message": "chore(deps): bump ossf/scorecard-action from 2.4.1 to 2.4.2 (#1001)\n\nBumps [ossf/scorecard-action](https://github.com/ossf/scorecard-action) from 2.4.1 to 2.4.2.\n- [Release notes](https://github.com/ossf/scorecard-action/releases)\n- [Changelog](https://github.com/ossf/scorecard-action/blob/main/RELEASE.md)\n- [Commits](https://github.com/ossf/scorecard-action/compare/f49aabe0b5af0936a0987cfb85d86b75731b0186...05b42c624433fc40578a4040d5cf5e36ddca8cde)\n\n---\nupdated-dependencies:\n- dependency-name: ossf/scorecard-action\n  dependency-version: 2.4.2\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2025-06-04T16:50:33Z",
+          "url": "https://github.com/warmchang/runwasi/commit/80aa9854ad216df12bdd25987071f550d731c4b4"
+        },
+        "date": 1749174186735,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-app:latest",
+            "value": 142152011,
+            "range": "± 4620053",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-oci:latest",
+            "value": 83962769,
+            "range": "± 1043132",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-app:latest",
+            "value": 117898153,
+            "range": "± 4261754",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-oci:latest",
+            "value": 123086496,
+            "range": "± 2307965",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-app:latest",
+            "value": 134156413,
+            "range": "± 4855089",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-oci:latest",
+            "value": 140667910,
+            "range": "± 1923679",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-app:latest",
+            "value": 90665292,
+            "range": "± 2603573",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-oci:latest",
+            "value": 92203759,
+            "range": "± 2590515",
+            "unit": "ns/iter"
           }
         ]
       }
