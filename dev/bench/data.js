@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1749174590869,
+  "lastUpdate": 1749260431662,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -11484,6 +11484,52 @@ window.BENCHMARK_DATA = {
             "value": 92203759,
             "range": "± 2590515",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jiaxiao Zhou",
+            "username": "Mossaka",
+            "email": "duibao55328@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f372b70d85a651ed9ef75c4646ca41cea713ac76",
+          "message": "Merge pull request #1005 from tanishiking/fix-quickstart\n\ndocs: update quickstart to use containerd v2 configuration",
+          "timestamp": "2025-06-06T06:36:20Z",
+          "url": "https://github.com/warmchang/runwasi/commit/f372b70d85a651ed9ef75c4646ca41cea713ac76"
+        },
+        "date": 1749260429834,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15348,
+            "unit": "kB",
+            "extra": "shim: 12488 kB\nzygote: 2860 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66572,
+            "unit": "kB",
+            "extra": "shim: 53948 kB\nzygote: 12624 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18760,
+            "unit": "kB",
+            "extra": "shim: 15252 kB\nzygote: 3508 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 19544,
+            "unit": "kB",
+            "extra": "shim: 16112 kB\nzygote: 3432 kB"
           }
         ]
       }
