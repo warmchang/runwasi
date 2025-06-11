@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1749606970545,
+  "lastUpdate": 1749607118313,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -11994,6 +11994,76 @@ window.BENCHMARK_DATA = {
             "value": 19872,
             "unit": "kB",
             "extra": "shim: 16276 kB\nzygote: 3596 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jiaxiao Zhou",
+            "username": "Mossaka",
+            "email": "duibao55328@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "5322c335c73dd50c6b0ad78c8c1ff3e73b2188b2",
+          "message": "Merge pull request #1009 from containerd/dependabot/cargo/patch-2599ad99c4\n\nchore(deps): bump toml from 0.8.22 to 0.8.23 in the patch group",
+          "timestamp": "2025-06-10T06:01:59Z",
+          "url": "https://github.com/warmchang/runwasi/commit/5322c335c73dd50c6b0ad78c8c1ff3e73b2188b2"
+        },
+        "date": 1749607116760,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-app:latest",
+            "value": 146624492,
+            "range": "± 4806484",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-oci:latest",
+            "value": 84183743,
+            "range": "± 1210518",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-app:latest",
+            "value": 118902433,
+            "range": "± 1486663",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-oci:latest",
+            "value": 125375207,
+            "range": "± 3501997",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-app:latest",
+            "value": 136438869,
+            "range": "± 4267682",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-oci:latest",
+            "value": 141600318,
+            "range": "± 3179693",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-app:latest",
+            "value": 90327604,
+            "range": "± 2799765",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-oci:latest",
+            "value": 89055654,
+            "range": "± 1898892",
+            "unit": "ns/iter"
           }
         ]
       }
