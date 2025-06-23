@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1750557587530,
+  "lastUpdate": 1750643357696,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -13340,6 +13340,52 @@ window.BENCHMARK_DATA = {
             "value": 86371845,
             "range": "± 1806346",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jiaxiao Zhou",
+            "username": "Mossaka",
+            "email": "duibao55328@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "ed2ab4f081e22ad89fd330fb152efcb89a2186d1",
+          "message": "Merge pull request #1013 from containerd/dependabot/github_actions/anchore/sbom-action-0.20.1\n\nchore(deps): bump anchore/sbom-action from 0.20.0 to 0.20.1",
+          "timestamp": "2025-06-17T04:03:23Z",
+          "url": "https://github.com/warmchang/runwasi/commit/ed2ab4f081e22ad89fd330fb152efcb89a2186d1"
+        },
+        "date": 1750643355765,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 14916,
+            "unit": "kB",
+            "extra": "shim: 12012 kB\nzygote: 2904 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66248,
+            "unit": "kB",
+            "extra": "shim: 53556 kB\nzygote: 12692 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18836,
+            "unit": "kB",
+            "extra": "shim: 15236 kB\nzygote: 3600 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 19864,
+            "unit": "kB",
+            "extra": "shim: 16268 kB\nzygote: 3596 kB"
           }
         ]
       }
