@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1756605006504,
+  "lastUpdate": 1756691370738,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -21460,6 +21460,52 @@ window.BENCHMARK_DATA = {
             "value": 19984,
             "unit": "kB",
             "extra": "shim: 16468 kB\nzygote: 3516 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jiaxiao Zhou",
+            "username": "Mossaka",
+            "email": "duibao55328@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "16457f59851b476128e702be999704c604dac328",
+          "message": "Merge pull request #1035 from containerd/dependabot/github_actions/bnjbvr/cargo-machete-0.9.1\n\nchore(deps): bump bnjbvr/cargo-machete from 0.8.0 to 0.9.1",
+          "timestamp": "2025-08-27T20:55:07Z",
+          "url": "https://github.com/warmchang/runwasi/commit/16457f59851b476128e702be999704c604dac328"
+        },
+        "date": 1756691367873,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 14856,
+            "unit": "kB",
+            "extra": "shim: 11944 kB\nzygote: 2912 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66408,
+            "unit": "kB",
+            "extra": "shim: 53800 kB\nzygote: 12608 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 19036,
+            "unit": "kB",
+            "extra": "shim: 15508 kB\nzygote: 3528 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20188,
+            "unit": "kB",
+            "extra": "shim: 16592 kB\nzygote: 3596 kB"
           }
         ]
       }
