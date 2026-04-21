@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1776656672450,
+  "lastUpdate": 1776739239680,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -48326,6 +48326,52 @@ window.BENCHMARK_DATA = {
             "value": 280960230,
             "range": "± 6877537",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jorge Prendes",
+            "username": "jprendes",
+            "email": "jorge.prendes@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "eac1a498ab9ad0cfec386e6f6b4ea321ee16984d",
+          "message": "update registry for apk-anywhere (#1107)\n\nSigned-off-by: Jorge Prendes <jorge.prendes@gmail.com>",
+          "timestamp": "2026-04-15T16:08:55Z",
+          "url": "https://github.com/warmchang/runwasi/commit/eac1a498ab9ad0cfec386e6f6b4ea321ee16984d"
+        },
+        "date": 1776739225026,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15332,
+            "unit": "kB",
+            "extra": "shim: 12380 kB\nzygote: 2952 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66076,
+            "unit": "kB",
+            "extra": "shim: 53448 kB\nzygote: 12628 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18464,
+            "unit": "kB",
+            "extra": "shim: 15056 kB\nzygote: 3408 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20144,
+            "unit": "kB",
+            "extra": "shim: 16524 kB\nzygote: 3620 kB"
           }
         ]
       }
