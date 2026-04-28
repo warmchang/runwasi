@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1777345109543,
+  "lastUpdate": 1777345221187,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -49184,6 +49184,76 @@ window.BENCHMARK_DATA = {
             "value": 20164,
             "unit": "kB",
             "extra": "shim: 16676 kB\nzygote: 3488 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "eb9967aae75bfc8ddf810590810f6962a8dc7c37",
+          "message": "chore(deps): bump dorny/paths-filter from 3 to 4 (#1090)\n\nBumps [dorny/paths-filter](https://github.com/dorny/paths-filter) from 3 to 4.\n- [Release notes](https://github.com/dorny/paths-filter/releases)\n- [Changelog](https://github.com/dorny/paths-filter/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/dorny/paths-filter/compare/v3...v4)\n\n---\nupdated-dependencies:\n- dependency-name: dorny/paths-filter\n  dependency-version: '4'\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-04-21T13:18:25Z",
+          "url": "https://github.com/warmchang/runwasi/commit/eb9967aae75bfc8ddf810590810f6962a8dc7c37"
+        },
+        "date": 1777345206751,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-app:latest",
+            "value": 352826139,
+            "range": "± 5060337",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-oci:latest",
+            "value": 280632454,
+            "range": "± 8243462",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-app:latest",
+            "value": 388026049,
+            "range": "± 6971131",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-oci:latest",
+            "value": 392893035,
+            "range": "± 6434542",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-app:latest",
+            "value": 344922721,
+            "range": "± 6362518",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-oci:latest",
+            "value": 354789427,
+            "range": "± 6712390",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-app:latest",
+            "value": 271935452,
+            "range": "± 4353753",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-oci:latest",
+            "value": 277622864,
+            "range": "± 6459791",
+            "unit": "ns/iter"
           }
         ]
       }
