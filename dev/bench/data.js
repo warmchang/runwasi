@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1778122548833,
+  "lastUpdate": 1778122632754,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -50228,6 +50228,76 @@ window.BENCHMARK_DATA = {
             "value": 20648,
             "unit": "kB",
             "extra": "shim: 17092 kB\nzygote: 3556 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jiaxiao Zhou",
+            "username": "Mossaka",
+            "email": "duibao55328@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "29381636872dc7549e594a6e01478f4c51562f87",
+          "message": "MAINTAINERS: update Jiaxiao Zhou email to personal address (#1116)\n\nSigned-off-by: Jiaxiao (mossaka) Zhou <duibao55328@gmail.com>",
+          "timestamp": "2026-05-05T10:22:55Z",
+          "url": "https://github.com/warmchang/runwasi/commit/29381636872dc7549e594a6e01478f4c51562f87"
+        },
+        "date": 1778122614973,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-app:latest",
+            "value": 301954473,
+            "range": "± 6361748",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-oci:latest",
+            "value": 229998693,
+            "range": "± 5546469",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-app:latest",
+            "value": 313871964,
+            "range": "± 5213396",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-oci:latest",
+            "value": 322904301,
+            "range": "± 3637953",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-app:latest",
+            "value": 294833527,
+            "range": "± 7396209",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-oci:latest",
+            "value": 301757678,
+            "range": "± 5999691",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-app:latest",
+            "value": 227374941,
+            "range": "± 5498384",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-oci:latest",
+            "value": 234275986,
+            "range": "± 4270544",
+            "unit": "ns/iter"
           }
         ]
       }
