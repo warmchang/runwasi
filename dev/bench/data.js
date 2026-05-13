@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1778558349778,
+  "lastUpdate": 1778643070104,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -50878,6 +50878,52 @@ window.BENCHMARK_DATA = {
             "value": 285995145,
             "range": "± 8202742",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Brian Goff",
+            "username": "cpuguy83",
+            "email": "cpuguy83@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b456f0bd301c8607dbaf5c0e73d76fdab1cad9f8",
+          "message": "README: clarify containerd sub-project status (#1124)\n\nThis was accidentally removed in https://github.com/containerd/runwasi/commit/1599a7809d2ee46ab6349dcef05822c63452d6ad\n\nSigned-off-by: Brian Goff <cpuguy83@gmail.com>",
+          "timestamp": "2026-05-12T09:17:06Z",
+          "url": "https://github.com/warmchang/runwasi/commit/b456f0bd301c8607dbaf5c0e73d76fdab1cad9f8"
+        },
+        "date": 1778643052407,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15468,
+            "unit": "kB",
+            "extra": "shim: 12380 kB\nzygote: 3088 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66556,
+            "unit": "kB",
+            "extra": "shim: 53860 kB\nzygote: 12696 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18724,
+            "unit": "kB",
+            "extra": "shim: 15184 kB\nzygote: 3540 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20476,
+            "unit": "kB",
+            "extra": "shim: 16916 kB\nzygote: 3560 kB"
           }
         ]
       }
