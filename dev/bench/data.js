@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1778643070104,
+  "lastUpdate": 1778643174969,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -50924,6 +50924,76 @@ window.BENCHMARK_DATA = {
             "value": 20476,
             "unit": "kB",
             "extra": "shim: 16916 kB\nzygote: 3560 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Brian Goff",
+            "username": "cpuguy83",
+            "email": "cpuguy83@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b456f0bd301c8607dbaf5c0e73d76fdab1cad9f8",
+          "message": "README: clarify containerd sub-project status (#1124)\n\nThis was accidentally removed in https://github.com/containerd/runwasi/commit/1599a7809d2ee46ab6349dcef05822c63452d6ad\n\nSigned-off-by: Brian Goff <cpuguy83@gmail.com>",
+          "timestamp": "2026-05-12T09:17:06Z",
+          "url": "https://github.com/warmchang/runwasi/commit/b456f0bd301c8607dbaf5c0e73d76fdab1cad9f8"
+        },
+        "date": 1778643159817,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-app:latest",
+            "value": 355700484,
+            "range": "± 7148990",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmtime/wasi-demo-oci:latest",
+            "value": 283372686,
+            "range": "± 5144556",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-app:latest",
+            "value": 391568382,
+            "range": "± 4652218",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmedge/wasi-demo-oci:latest",
+            "value": 408109131,
+            "range": "± 9571897",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-app:latest",
+            "value": 350194313,
+            "range": "± 8179727",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wasmer/wasi-demo-oci:latest",
+            "value": 369330584,
+            "range": "± 8941276",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-app:latest",
+            "value": 275010469,
+            "range": "± 8225979",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "end-to-end/wamr/wasi-demo-oci:latest",
+            "value": 286644663,
+            "range": "± 9400239",
+            "unit": "ns/iter"
           }
         ]
       }
