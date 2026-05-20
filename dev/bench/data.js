@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779161996107,
+  "lastUpdate": 1779249075894,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -51690,6 +51690,52 @@ window.BENCHMARK_DATA = {
             "value": 281591502,
             "range": "± 5948079",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "James Sturtevant",
+            "username": "jsturtevant",
+            "email": "jsturtevant@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "1081edb4e00bfec3f73c0c0100e773a0677802d3",
+          "message": "Merge pull request #1135 from containerd/dependabot/cargo/openssl-0.10.80\n\nchore(deps): bump openssl from 0.10.79 to 0.10.80",
+          "timestamp": "2026-05-19T21:41:06Z",
+          "url": "https://github.com/warmchang/runwasi/commit/1081edb4e00bfec3f73c0c0100e773a0677802d3"
+        },
+        "date": 1779249055757,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 14948,
+            "unit": "kB",
+            "extra": "shim: 12108 kB\nzygote: 2840 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66592,
+            "unit": "kB",
+            "extra": "shim: 53896 kB\nzygote: 12696 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 18820,
+            "unit": "kB",
+            "extra": "shim: 15280 kB\nzygote: 3540 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20544,
+            "unit": "kB",
+            "extra": "shim: 16984 kB\nzygote: 3560 kB"
           }
         ]
       }
