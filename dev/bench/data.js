@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779335895562,
+  "lastUpdate": 1779335898191,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -51806,6 +51806,52 @@ window.BENCHMARK_DATA = {
             "value": 277056576,
             "range": "± 9995204",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "James Sturtevant",
+            "username": "jsturtevant",
+            "email": "jsturtevant@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "ac26a95840e334b8f8335a1cc5dd496d58fc5cf5",
+          "message": "Merge pull request #1109 from TheRayquaza/feat/release-sha256sums\n\nrelease: include SHA256SUMS in github release assets",
+          "timestamp": "2026-05-20T14:22:20Z",
+          "url": "https://github.com/warmchang/runwasi/commit/ac26a95840e334b8f8335a1cc5dd496d58fc5cf5"
+        },
+        "date": 1779335877376,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15320,
+            "unit": "kB",
+            "extra": "shim: 12376 kB\nzygote: 2944 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 66900,
+            "unit": "kB",
+            "extra": "shim: 54168 kB\nzygote: 12732 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 19424,
+            "unit": "kB",
+            "extra": "shim: 15788 kB\nzygote: 3636 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20216,
+            "unit": "kB",
+            "extra": "shim: 16692 kB\nzygote: 3524 kB"
           }
         ]
       }
