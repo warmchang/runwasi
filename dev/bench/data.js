@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780026790534,
+  "lastUpdate": 1780026851674,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -64445,6 +64445,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "HTTP RPS",
             "value": 22555.8552,
+            "unit": "req/s"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "James Sturtevant",
+            "username": "jsturtevant",
+            "email": "jsturtevant@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b2f673934ff1f53ab2fc0c76dd2873934170ff4d",
+          "message": "Merge pull request #1139 from jsturtevant/more-libupdates\n\nUpdate wasmer to the latest sdk",
+          "timestamp": "2026-05-28T17:06:02Z",
+          "url": "https://github.com/warmchang/runwasi/commit/b2f673934ff1f53ab2fc0c76dd2873934170ff4d"
+        },
+        "date": 1780026838357,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "HTTP RPS",
+            "value": 21094.4707,
             "unit": "req/s"
           }
         ]
