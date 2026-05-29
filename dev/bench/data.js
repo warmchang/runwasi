@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779940149156,
+  "lastUpdate": 1780026790534,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -52734,6 +52734,52 @@ window.BENCHMARK_DATA = {
             "value": 87193544,
             "range": "± 1848065",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "James Sturtevant",
+            "username": "jsturtevant",
+            "email": "jsturtevant@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b2f673934ff1f53ab2fc0c76dd2873934170ff4d",
+          "message": "Merge pull request #1139 from jsturtevant/more-libupdates\n\nUpdate wasmer to the latest sdk",
+          "timestamp": "2026-05-28T17:06:02Z",
+          "url": "https://github.com/warmchang/runwasi/commit/b2f673934ff1f53ab2fc0c76dd2873934170ff4d"
+        },
+        "date": 1780026780594,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 16028,
+            "unit": "kB",
+            "extra": "shim: 12820 kB\nzygote: 3208 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 75232,
+            "unit": "kB",
+            "extra": "shim: 62336 kB\nzygote: 12896 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 19952,
+            "unit": "kB",
+            "extra": "shim: 16000 kB\nzygote: 3952 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20712,
+            "unit": "kB",
+            "extra": "shim: 16816 kB\nzygote: 3896 kB"
           }
         ]
       }
