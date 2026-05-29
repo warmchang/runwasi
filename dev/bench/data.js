@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780026851674,
+  "lastUpdate": 1780026853574,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -76138,6 +76138,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "HTTP p95 Latency",
             "value": 4.1000000000000005,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "James Sturtevant",
+            "username": "jsturtevant",
+            "email": "jsturtevant@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b2f673934ff1f53ab2fc0c76dd2873934170ff4d",
+          "message": "Merge pull request #1139 from jsturtevant/more-libupdates\n\nUpdate wasmer to the latest sdk",
+          "timestamp": "2026-05-28T17:06:02Z",
+          "url": "https://github.com/warmchang/runwasi/commit/b2f673934ff1f53ab2fc0c76dd2873934170ff4d"
+        },
+        "date": 1780026853247,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "HTTP p95 Latency",
+            "value": 4.4,
             "unit": "ms"
           }
         ]
