@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781063923107,
+  "lastUpdate": 1781150559698,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -54242,6 +54242,52 @@ window.BENCHMARK_DATA = {
             "value": 20368,
             "unit": "kB",
             "extra": "shim: 16436 kB\nzygote: 3932 kB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "James Sturtevant",
+            "username": "jsturtevant",
+            "email": "jsturtevant@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f1de5dfa600a53dca262a28adc22b8d5dac79291",
+          "message": "Merge pull request #1143 from containerd/dependabot/cargo/containerd-client-0.8.0\n\nchore(deps): bump containerd-client from 0.6.0 to 0.8.0",
+          "timestamp": "2026-05-28T17:41:01Z",
+          "url": "https://github.com/warmchang/runwasi/commit/f1de5dfa600a53dca262a28adc22b8d5dac79291"
+        },
+        "date": 1781150543093,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15564,
+            "unit": "kB",
+            "extra": "shim: 12392 kB\nzygote: 3172 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 75336,
+            "unit": "kB",
+            "extra": "shim: 62440 kB\nzygote: 12896 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 20068,
+            "unit": "kB",
+            "extra": "shim: 16044 kB\nzygote: 4024 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20240,
+            "unit": "kB",
+            "extra": "shim: 16408 kB\nzygote: 3832 kB"
           }
         ]
       }
