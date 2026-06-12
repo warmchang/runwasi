@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781151346813,
+  "lastUpdate": 1781237715654,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -54358,6 +54358,52 @@ window.BENCHMARK_DATA = {
             "value": 104732789,
             "range": "± 9808367",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jorge Prendes",
+            "username": "jprendes",
+            "email": "jorge.prendes@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "d9154c263427ae6c462ba82c21d944b2d1cd58e8",
+          "message": "chore: bump crates patch versions (#1154)\n\nSigned-off-by: Jorge Prendes <jorge.prendes@gmail.com>",
+          "timestamp": "2026-06-11T00:08:00Z",
+          "url": "https://github.com/warmchang/runwasi/commit/d9154c263427ae6c462ba82c21d944b2d1cd58e8"
+        },
+        "date": 1781237699940,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15820,
+            "unit": "kB",
+            "extra": "shim: 12612 kB\nzygote: 3208 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 75208,
+            "unit": "kB",
+            "extra": "shim: 62316 kB\nzygote: 12892 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 20092,
+            "unit": "kB",
+            "extra": "shim: 16084 kB\nzygote: 4008 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20332,
+            "unit": "kB",
+            "extra": "shim: 16400 kB\nzygote: 3932 kB"
           }
         ]
       }
