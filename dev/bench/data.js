@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781238285365,
+  "lastUpdate": 1781322539674,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -54474,6 +54474,52 @@ window.BENCHMARK_DATA = {
             "value": 86094774,
             "range": "± 3413573",
             "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jorge Prendes",
+            "username": "jprendes",
+            "email": "jorge.prendes@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "5a8fc8e9ee0df28b0485da7419ee74c72127dfba",
+          "message": "Add an extra space in zygote version to fix CI version check (#1155)\n\nSigned-off-by: Jorge Prendes <jorge.prendes@gmail.com>",
+          "timestamp": "2026-06-12T15:44:58Z",
+          "url": "https://github.com/warmchang/runwasi/commit/5a8fc8e9ee0df28b0485da7419ee74c72127dfba"
+        },
+        "date": 1781322526671,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "wamr/memory-usage",
+            "value": 15616,
+            "unit": "kB",
+            "extra": "shim: 12528 kB\nzygote: 3088 kB"
+          },
+          {
+            "name": "wasmedge/memory-usage",
+            "value": 74956,
+            "unit": "kB",
+            "extra": "shim: 62128 kB\nzygote: 12828 kB"
+          },
+          {
+            "name": "wasmer/memory-usage",
+            "value": 20160,
+            "unit": "kB",
+            "extra": "shim: 16160 kB\nzygote: 4000 kB"
+          },
+          {
+            "name": "wasmtime/memory-usage",
+            "value": 20460,
+            "unit": "kB",
+            "extra": "shim: 16464 kB\nzygote: 3996 kB"
           }
         ]
       }
