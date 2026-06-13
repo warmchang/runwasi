@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781322548506,
+  "lastUpdate": 1781322550368,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -78688,6 +78688,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "HTTP p95 Latency",
             "value": 4.8999999999999995,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jorge Prendes",
+            "username": "jprendes",
+            "email": "jorge.prendes@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "5a8fc8e9ee0df28b0485da7419ee74c72127dfba",
+          "message": "Add an extra space in zygote version to fix CI version check (#1155)\n\nSigned-off-by: Jorge Prendes <jorge.prendes@gmail.com>",
+          "timestamp": "2026-06-12T15:44:58Z",
+          "url": "https://github.com/warmchang/runwasi/commit/5a8fc8e9ee0df28b0485da7419ee74c72127dfba"
+        },
+        "date": 1781322550073,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "HTTP p95 Latency",
+            "value": 4.4,
             "unit": "ms"
           }
         ]
