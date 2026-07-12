@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783824623149,
+  "lastUpdate": 1783825050042,
   "repoUrl": "https://github.com/warmchang/runwasi",
   "entries": {
     "Criterion.rs Benchmark": [
@@ -129026,6 +129026,100 @@ window.BENCHMARK_DATA = {
             "value": 16.605175992401207,
             "unit": "tasks/s",
             "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 1m 222ms 186us 170ns"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "James Sturtevant",
+            "username": "jsturtevant",
+            "email": "jsturtevant@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f1401719a3e981956ced9cd685abb2a49190bd1c",
+          "message": "Merge pull request #1153 from containerd/dependabot/cargo/patch-e21a0282c3\n\nchore(deps): bump the patch group across 1 directory with 3 updates",
+          "timestamp": "2026-06-13T00:38:57Z",
+          "url": "https://github.com/warmchang/runwasi/commit/f1401719a3e981956ced9cd685abb2a49190bd1c"
+        },
+        "date": 1783825027697,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Stress Test Throughput with containerd service - wamr (app)",
+            "value": 60.80767198411016,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 16s 445ms 293us 289ns"
+          },
+          {
+            "name": "Stress Test Throughput with containerd service - wasmedge (app)",
+            "value": 32.87049387216606,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 30s 422ms 420us 907ns"
+          },
+          {
+            "name": "Stress Test Throughput with containerd service - wasmer (app)",
+            "value": 14.192748586468689,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 1m 10s 458ms 515us 763ns"
+          },
+          {
+            "name": "Stress Test Throughput with containerd service - wasmtime (app)",
+            "value": 12.158753180837937,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 1m 22s 245ms 275us 81ns"
+          },
+          {
+            "name": "Stress Test Throughput with containerd service - wamr (oci)",
+            "value": 49.27447262296199,
+            "unit": "tasks/s",
+            "extra": "Image: oci\nTasks: 1000\nParallel: 4\nDuration: 20s 294ms 484us 76ns"
+          },
+          {
+            "name": "Stress Test Throughput with containerd service - wasmedge (oci)",
+            "value": 30.218613994968788,
+            "unit": "tasks/s",
+            "extra": "Image: oci\nTasks: 1000\nParallel: 4\nDuration: 33s 92ms 186us 166ns"
+          },
+          {
+            "name": "Stress Test Throughput with containerd service - wasmer (oci)",
+            "value": 13.291062590275406,
+            "unit": "tasks/s",
+            "extra": "Image: oci\nTasks: 1000\nParallel: 4\nDuration: 1m 15s 238ms 529us 140ns"
+          },
+          {
+            "name": "Stress Test Throughput with containerd service - wasmtime (oci)",
+            "value": 46.46543430194902,
+            "unit": "tasks/s",
+            "extra": "Image: oci\nTasks: 1000\nParallel: 4\nDuration: 21s 521ms 374us 222ns"
+          },
+          {
+            "name": "Stress Test Throughput with mock service - wamr (app)",
+            "value": 88.34104817635837,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 11s 319ms 766us 73ns"
+          },
+          {
+            "name": "Stress Test Throughput with mock service - wasmedge (app)",
+            "value": 70.1900704530572,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 14s 247ms 29us 438ns"
+          },
+          {
+            "name": "Stress Test Throughput with mock service - wasmer (app)",
+            "value": 16.74893018428937,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 59s 705ms 305us 891ns"
+          },
+          {
+            "name": "Stress Test Throughput with mock service - wasmtime (app)",
+            "value": 14.351614065107714,
+            "unit": "tasks/s",
+            "extra": "Image: app\nTasks: 1000\nParallel: 4\nDuration: 1m 9s 678ms 573us 815ns"
           }
         ]
       }
